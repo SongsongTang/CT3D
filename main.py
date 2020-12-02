@@ -41,8 +41,10 @@ class FDK(object):
             U = self.R + self.x_array * np.cos(beta) + self.y_array * np.sin(beta)
             a = self.R / U * (-self.x_array * np.sin(beta) + self.y_array * np.cos(beta))
             b = self.R / U * self.z_array
-            a_around = (np.around((a - self.T / 2) / self.T) * self.T + self.T / 2)[:, ::-1, :]
-            b_around = (np.around((b - self.T / 2) / self.T) * self.T + self.T / 2)[:, :, ::-1]
+            #a_around = (np.around((a - self.T / 2) / self.T) * self.T + self.T / 2)[:, ::-1, :]
+            a_around = -(np.around((a - self.T / 2) / self.T) * self.T + self.T / 2) # F version
+            #b_around = (np.around((b - self.T / 2) / self.T) * self.T + self.T / 2)[:, :, ::-1]
+            b_around = -(np.around((b - self.T / 2) / self.T) * self.T + self.T / 2)    # F version
             a_around[a_around > ((self.l - self.T) / 2)] = (self.l - self.T) / 2
             a_around[a_around < ((-self.l + self.T) / 2)] = (-self.l + self.T) / 2
             b_around[b_around > ((self.l - self.T) / 2)] = (self.l - self.T) / 2
@@ -50,7 +52,7 @@ class FDK(object):
             a_index = ((a_around + (self.l - self.T) / 2) / self.T).astype(int)
             b_index = ((b_around + (self.l - self.T) / 2) / self.T).astype(int)
             # np.savetxt("a_index.txt", a_index)
-            print(int(np.around(beta*180/np.pi)), end='\r')
+            print(int(np.around(beta*180/np.pi)), end='\t')
             #f = self.R**2 / U**2 * self.convolved_data[int(np.around(beta*180/np.pi)), a_index, b_index]
             f = self.R**2 / U**2 * self.convolved_data[b_index, a_index, int(np.around(beta*180/np.pi))]    # F version
             self.f_fdk += f
