@@ -15,15 +15,15 @@ class FDK(object):
         stime = time.time()
         raw_data = np.fromfile(fname, np.float32)
         # read / write the elements using Fortran-like / MATLAB-like index order
-        self.data = raw_data.reshape(256, 256, 360, order='F')  # reshape the data as (b, a, beta)
-        #self.data = raw_data.reshape(360, 256, 256) # reshape the data as (beta, a, b)
+        # self.data = raw_data.reshape(256, 256, 360, order='F')  # reshape the data as (b, a, beta)
+        self.data = raw_data.reshape(360, 256, 256) # reshape the data as (beta, a, b)
         self.kn = np.linspace(-255, 255, 511)    # convolution kernel
         self.l = 20 # virtual detector length
         self.n = 256    # detector number
         self.T = self.l / self.n   # per detector length
         self.a = np.linspace((self.l - self.T) / 2, (-self.l + self.T) / 2, self.n)[np.newaxis, :, np.newaxis] # a array
-        #self.b = np.linspace((self.l - self.T) / 2, (-self.l + self.T) / 2, self.n)[np.newaxis, np.newaxis, :] # b array
-        self.b = np.linspace((self.l - self.T) / 2, (-self.l + self.T) / 2, self.n)[:, np.newaxis, np.newaxis] # b array F version
+        self.b = np.linspace((self.l - self.T) / 2, (-self.l + self.T) / 2, self.n)[np.newaxis, np.newaxis, :] # b array
+        # self.b = np.linspace((self.l - self.T) / 2, (-self.l + self.T) / 2, self.n)[:, np.newaxis, np.newaxis] # b array F version
         self.R = 40 # the distance between source and rotational center
         #print(self.R / np.sqrt(self.R ** 2 + self.a ** 2 + self.b ** 2))
         #print(np.shape(self.R / np.sqrt(self.R ** 2 + self.a ** 2 + self.b ** 2)))
@@ -41,9 +41,9 @@ class FDK(object):
             U = self.R + self.x_array * np.cos(beta) + self.y_array * np.sin(beta)
             a = self.R / U * (-self.x_array * np.sin(beta) + self.y_array * np.cos(beta))
             b = self.R / U * self.z_array
-            a_around = (np.around((a - self.T / 2) / self.T) * self.T + self.T / 2)
+            a_around = (np.around((a - self.T / 2) / self.T) * self.T + self.T / 2)[:, ::-1, :]
             # a_around = (np.around((a - self.T / 2) / self.T) * self.T + self.T / 2)[:, ::-1, :] # F version
-            b_around = (np.around((b - self.T / 2) / self.T) * self.T + self.T / 2)
+            b_around = (np.around((b - self.T / 2) / self.T) * self.T + self.T / 2)[:, :, ::-1]
             # b_around = (np.around((b - self.T / 2) / self.T) * self.T + self.T / 2)[:, ::-1, ::-1]    # F version
             a_around[a_around > ((self.l - self.T) / 2)] = (self.l - self.T) / 2
             a_around[a_around < ((-self.l + self.T) / 2)] = (-self.l + self.T) / 2
@@ -53,8 +53,8 @@ class FDK(object):
             b_index = ((b_around + (self.l - self.T) / 2) / self.T).astype(int)
             # np.savetxt("a_index.txt", a_index)
             print(int(np.around(beta*180/np.pi)), end='\t')
-            #f = self.R**2 / U**2 * self.convolved_data[int(np.around(beta*180/np.pi)), a_index, b_index]
-            f = self.R**2 / U**2 * self.convolved_data[b_index, a_index, int(np.around(beta*180/np.pi))]    # F version
+            f = self.R**2 / U**2 * self.convolved_data[int(np.around(beta*180/np.pi)), a_index, b_index]
+            # f = self.R**2 / U**2 * self.convolved_data[b_index, a_index, int(np.around(beta*180/np.pi))]    # F version
             self.f_fdk += f
         mdic = {"fdk_shepplogan": self.f_fdk}
         sio.savemat("./data/fdk_shepplogan.mat", mdic)
@@ -85,4 +85,4 @@ class Analysis(object):
         plt.show()
 if __name__ == "__main__":
     ct = FDK("./data/Circular CBCT_flat_panel_detector.prj")
-    #a = Analysis()
+    a = Analysis()
