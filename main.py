@@ -21,7 +21,7 @@ class FDK(object):
         self.l = 20 # virtual detector length
         self.n = 256    # detector number
         self.T = self.l / self.n   # per detector length
-        self.a = np.linspace((self.l - self.T) / 2, (-self.l + self.T) / 2, self.n)[np.newaxis, :, np.newaxis] # a array
+        self.a = np.linspace((-self.l + self.T) / 2, (self.l - self.T) / 2, self.n)[np.newaxis, :, np.newaxis] # a array
         self.b = np.linspace((self.l - self.T) / 2, (-self.l + self.T) / 2, self.n)[np.newaxis, np.newaxis, :] # b array
         # self.b = np.linspace((self.l - self.T) / 2, (-self.l + self.T) / 2, self.n)[:, np.newaxis, np.newaxis] # b array F version
         self.R = 40 # the distance between source and rotational center
@@ -29,7 +29,7 @@ class FDK(object):
         #print(np.shape(self.R / np.sqrt(self.R ** 2 + self.a ** 2 + self.b ** 2)))
         self.x_array = np.linspace((-self.l + self.T) / 2, (self.l - self.T) / 2, self.n)[:, np.newaxis, np.newaxis]
         self.y_array = np.linspace((-self.l + self.T) / 2, (self.l - self.T) / 2, self.n)[np.newaxis, :, np.newaxis]
-        self.z_array = np.linspace((-self.l + self.T) / 2, (self.l - self.T) / 2, self.n)[np.newaxis, np.newaxis, :]
+        self.z_array = np.linspace((self.l - self.T) / 2, (-self.l + self.T) / 2, self.n)[np.newaxis, np.newaxis, :]
         self.beta_array = np.arange(0, 2 * np.pi, np.pi / 180)
         self.rf = self.ramp_filter()
         self.pw_data = self.pre_weighting()
@@ -43,7 +43,7 @@ class FDK(object):
             b = self.R / U * self.z_array
             a_around = (np.around((a - self.T / 2) / self.T) * self.T + self.T / 2)#[:, ::-1, :]
             # a_around = (np.around((a - self.T / 2) / self.T) * self.T + self.T / 2)[:, ::-1, :] # F version
-            b_around = (np.around((b - self.T / 2) / self.T) * self.T + self.T / 2)[:, :, ::-1]
+            b_around = (np.around((b - self.T / 2) / self.T) * self.T + self.T / 2)#[:, :, ::-1]
             # b_around = (np.around((b - self.T / 2) / self.T) * self.T + self.T / 2)[:, ::-1, ::-1]    # F version
             a_around[a_around > ((self.l - self.T) / 2)] = (self.l - self.T) / 2
             a_around[a_around < ((-self.l + self.T) / 2)] = (-self.l + self.T) / 2
@@ -84,5 +84,5 @@ class Analysis(object):
         plt.colorbar()
         plt.show()
 if __name__ == "__main__":
-    # ct = FDK("./data/Circular CBCT_flat_panel_detector.prj")
+    ct = FDK("./data/Circular CBCT_flat_panel_detector.prj")
     a = Analysis()
