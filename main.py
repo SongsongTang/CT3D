@@ -61,8 +61,9 @@ class FDK(object):
         sio.savemat("./data/fdk_shepplogan.mat", mdic)
         etime = time.time()
         print(np.around(etime - stime))
+
     def ramp_filter(self):
-        return -2 / ((np.pi * self.T) ** 2 * (4 * self.kn ** 2 - 1))[np.newaxis, np.newaxis, :]
+        return -2 / ((np.pi * self.T) ** 2 * (4 * self.kn ** 2 - 1))[np.newaxis, :, np.newaxis]
 
     def pre_weighting(self):
         return self.R * self.data / np.sqrt(self.R ** 2 + self.a ** 2 + self.b ** 2)
