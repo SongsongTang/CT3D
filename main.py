@@ -23,8 +23,10 @@ class FDK(object):
         self.a = np.linspace((self.l - self.T) / 2, -(self.l - self.T) / 2, self.n)[np.newaxis, :, np.newaxis]
         pre_weighting_factor = self.R / np.sqrt(self.R ** 2 + self.a ** 2 + self.b **2)
         self.pw_data = pre_weighting_factor * self.data
-        convolve_kernel = 2 / ((np.pi * self.T) ** 2 * (4 * self.kn ** 2 - 1))[np.newaxis, :, np.newaxis]
+        # convolve_kernel = 2 / ((np.pi * self.T) ** 2 * (4 * self.kn ** 2 - 1))[np.newaxis, :, np.newaxis]
+        convolve_kernel = self.rl_filter(self.kn, self.T)
         self.f_data = convolve(self.pw_data, convolve_kernel, mode='same')
+        # print(self.f_data[0, :, 127])
 
         self.x = np.linspace(-(self.l - self.T) / 2, (self.l - self.T) / 2, self.n)[:, np.newaxis, np.newaxis]
         self.y = np.linspace(-(self.l - self.T) / 2, (self.l - self.T) / 2, self.n)[np.newaxis, :, np.newaxis]
@@ -37,19 +39,41 @@ class FDK(object):
             b = self.R * self.z / U
             a_around = -(np.around((a - self.T / 2) / self.T) * self.T + self.T / 2)
             b_around = -(np.around((b - self.T / 2) / self.T) * self.T + self.T / 2)
+            # print(b, "*"*50, b_around)
             a_around[a_around > ((self.l - self.T) / 2)] = (self.l - self.T) / 2
             a_around[a_around < ((-self.l + self.T) / 2)] = (-self.l + self.T) / 2
             b_around[b_around > ((self.l - self.T) / 2)] = (self.l - self.T) / 2
             b_around[b_around < ((-self.l + self.T) / 2)] = (-self.l + self.T) / 2
+            # print(a_around, '\n', b_around)
             a_index = ((a_around + (self.l - self.T) / 2) / self.T).astype(int)
             b_index = ((b_around + (self.l - self.T) / 2) / self.T).astype(int)
             print(int(np.around(beta*180/np.pi)), end='\t')
             f = self.R**2 / U**2 * self.f_data[int(np.around(beta*180/np.pi)), a_index, b_index]
+            # print(f[127, 95, :])
             self.f_fdk += f
         mdic = {"fdk_shepplogan": self.f_fdk}
         sio.savemat("./data/fdk_shepplogan.mat", mdic)
         etime = time.time()
         print(np.around(etime - stime))
+
+    def rl_filter(self, n, T):
+        """
+            R-L滤波器
+            n为采样点数
+            T为采样间隔
+        """
+        f = np.zeros(np.shape(n))
+        j = 0
+        for i in n:
+            i = int(i)
+            if i == 0:
+                f[j] = 1/(2*T)**2
+            elif i%2:
+                f[j] = -1/(i*np.pi*T)**2
+            else:
+                f[j] = 0
+            j += 1
+        return f[np.newaxis, :, np.newaxis]
 
 
 class Analysis(object):
