@@ -17,6 +17,7 @@ class FDK(object):
         # read / write the elements using Fortran-like / MATLAB-like index order
         # self.data = raw_data.reshape(256, 256, 360, order='F')  # reshape the data as (b, a, beta)
         self.data = raw_data.reshape(360, 256, 256) # reshape the data as (beta, a, b)
+        self.data = self.data[:, ::-1, :]
         self.kn = np.linspace(-255, 255, 511)    # convolution kernel
         self.l = 20 # virtual detector length
         self.n = 256    # detector number
