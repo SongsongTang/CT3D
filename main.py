@@ -26,9 +26,9 @@ class FDK(object):
         convolve_kernel = 2 / ((np.pi * self.T) ** 2 * (4 * self.kn ** 2 - 1))[np.newaxis, :, np.newaxis]
         self.f_data = convolve(self.pw_data, convolve_kernel, mode='same')
 
-        self.x = np.linspace(-(self.l - self.T) / 2, (self.l - self.T) / 2, self.n)[:, np.newaxia, np.newaxis]
+        self.x = np.linspace(-(self.l - self.T) / 2, (self.l - self.T) / 2, self.n)[:, np.newaxis, np.newaxis]
         self.y = np.linspace(-(self.l - self.T) / 2, (self.l - self.T) / 2, self.n)[np.newaxis, :, np.newaxis]
-        self.z = np.linspace(-(self.l - self.T) / 2, (self.l - self.T) / 2, self.n)[np.newaxia, np.newaxis, :]
+        self.z = np.linspace(-(self.l - self.T) / 2, (self.l - self.T) / 2, self.n)[np.newaxis, np.newaxis, :]
         self.beta = np.arange(0, 2*np.pi, np.pi/180)
         self.f_fdk = np.zeros((256, 256, 256))
         for beta in self.beta:
@@ -44,7 +44,7 @@ class FDK(object):
             a_index = ((a_around + (self.l - self.T) / 2) / self.T).astype(int)
             b_index = ((b_around + (self.l - self.T) / 2) / self.T).astype(int)
             print(int(np.around(beta*180/np.pi)), end='\t')
-            f = self.R**2 / U**2 * self.convolved_data[int(np.around(beta*180/np.pi)), a_index, b_index]
+            f = self.R**2 / U**2 * self.f_data[int(np.around(beta*180/np.pi)), a_index, b_index]
             self.f_fdk += f
         mdic = {"fdk_shepplogan": self.f_fdk}
         sio.savemat("./data/fdk_shepplogan.mat", mdic)
