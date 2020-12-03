@@ -28,9 +28,9 @@ class FDK(object):
         self.f_data = convolve(self.pw_data, convolve_kernel, mode='same')
         # print(self.f_data[0, :, 127])
 
-        self.x = np.linspace(-(self.l - self.T) / 2, (self.l - self.T) / 2, self.n)[:, np.newaxis, np.newaxis]
+        self.x = np.linspace(-(self.l - self.T) / 2, (self.l - self.T) / 2, self.n)[np.newaxis, np.newaxis, :]
         self.y = np.linspace(-(self.l - self.T) / 2, (self.l - self.T) / 2, self.n)[np.newaxis, :, np.newaxis]
-        self.z = np.linspace(-(self.l - self.T) / 2, (self.l - self.T) / 2, self.n)[np.newaxis, np.newaxis, :]
+        self.z = np.linspace(-(self.l - self.T) / 2, (self.l - self.T) / 2, self.n)[:, np.newaxis, np.newaxis]
         self.beta = np.arange(0, 2*np.pi, np.pi/180)
         self.f_fdk = np.zeros((256, 256, 256))
         for beta in self.beta:
